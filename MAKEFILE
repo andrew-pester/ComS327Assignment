@@ -1,2 +1,2 @@
 dungeon: dungeon.c
-	GCC dungeon.c -o dungeon
+	gcc dungeon.c -o dungeon
