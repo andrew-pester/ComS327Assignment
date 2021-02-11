@@ -1,66 +1,73 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-char dung[80][21];
-
+#include <stdbool.h>
+char dung[21][80];
+struct room{
+  int x;//x coord in array
+  int y;//y coord in array
+  int x_size;//random x size
+  int y_size;//random y size
+};
 int main(int argc, char *argv[]){
-srand(time(NULL));
+  srand(time(NULL));
+  struct room rooms[6];
+  for(int i =0; i< 21;i++){
+    for(int j = 0; j<80;j++){
+      dung[i][j] = ' ';
+    }
+  }
+  makeRooms(rooms);
 
-makeMap();
+  for(int i =0; i< 21;i++){
+    for(int j = 0; j<80;j++){
+      printf("%c", dung[i][j]);
+    }
+    printf("\n");
+  }
+
 }
-int makeMap()
-{
-    //return 1 if true 0 if false for checking intersections
-    struct room{
-        int x;//x coord in array
-        int y;//y coord in array
-        int x_size;//random x size
-        int y_size;//random y size
-    };
-    struct room rooms[6];
-    for(int i =0;i<6;i++){
-        rooms[i].x = rand()%75 +1;
-        rooms[i].y = rand()%17 +1;
-        rooms[i].x_size = rand()%10 +4;
-        rooms[i].y_size = rand()%10 +3;
-
+int makeRooms(struct room *rooms){
+  //makes rooms in 6 different localized areas so the generation is random but rooms will never hit
+  //this works for generating random rooms
+  int tmpX = 0, tmpY = 0;
+  int up = rand()%6;//random room from 0 - 5
+  int down = rand()%6; //random room from 0 - 5
+  for(int i =0; i<6;i++){
+    rooms[i].x = rand()%5+tmpX;
+    rooms[i].y = rand()%3+tmpY;
+    rooms[i].x_size = rand()%5+4;
+    rooms[i].y_size = rand()%4+4;
+    if(i == up){
+      dung[rooms[i].y+2][rooms[i].x+2] = '<';
     }
-    //need to test more
-    for(int i = 0; i<6;i++){
-        for(int j = i+1; j<6; j++){
-            if (rooms[i].x  >= rooms[j].x || rooms[i].x+rooms[i].x_size >= rooms[j].x+rooms[j].x_size){
-                return 0;
-            } 
-  
-            if (rooms[i].y <= rooms[j].y || rooms[i].y +rooms[i].y_size <= rooms[j].y+rooms[j].y_size){
-                return 0;
-            }
-        }
+    if(i == down){
+      dung[rooms[i].y+2][rooms[i].x+2] = '>';
     }
-    for (int i = 0; i < 6; i++)
+    tmpX += 22;
+    if(i == 2){
+      tmpX = 0;
+      tmpY += 12;
+    }
+  }
+  for(int i = 0; i < 6; i++)
     {
-        int temp = 1;
-        fillArrayRoom(rooms[i].x, rooms[i].y, rooms[i].x+rooms[i].x_size, rooms[i].y+rooms[i].y_size);
-	if (i == 5){
-	  temp = 0;
-	}
-	fillArrayCorridor(rooms[i].x, rooms [i].y, room[temp].x, room[temp].y);
-	temp ++;
-    }
-    //put rooms in array here
-    return 1; 
-
+      fillArrayRoom(rooms[i].x, rooms[i].y, rooms[i].x+rooms[i].x_size, rooms[i].y+rooms[i].y_size);
+  }
 }
-
 void fillArrayRoom(int topX, int topY,int botX,int botY){
-    for(topX; topX<=botX;topX++){
-        for(topY; topY<=botY;topY++){
-            dung[topX][topY] = '.';
-        }
+  for(int i = topY; i<botY;i++){
+    for(int j = topX; j<botX;j++){
+      if(dung[i][j]== '<'|| dung[i][j]=='>'){
+      }else{
+        dung[i][j] = '.';
+      }
+            
     }
+  }
 }
 
+/*
 void fillArrayCorridor(int rm1x, int rm1y, int rm2x, int rm2y)
 {
   int tempx =0;
@@ -144,3 +151,4 @@ void fillArrayCorridor(int rm1x, int rm1y, int rm2x, int rm2y)
   }
   
 }
+*/
