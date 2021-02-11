@@ -84,7 +84,7 @@ void fillArrayRoom(int topX, int topY, int botX, int botY)
 }
 void buildCorridors(struct room *rooms)
 {
-  int num_corr = rand()%5 +6;
+  int num_corr = rand()%6 +6;
   for (int i = 0; i < num_corr; i++)
   {
     int startX = rooms[i%6].x;
