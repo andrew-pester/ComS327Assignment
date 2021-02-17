@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
+#include <endian.h>
+
 char dung[21][80];
 struct room
 {
@@ -12,6 +13,7 @@ struct room
 };
 int main(int argc, char *argv[])
 {
+
   srand(time(NULL));
   struct room rooms[6];
   for (int i = 0; i < 21; i++)
@@ -19,6 +21,34 @@ int main(int argc, char *argv[])
     for (int j = 0; j < 80; j++)
     {
       dung[i][j] = ' ';
+    }
+  }
+
+  if (argc > 1)
+  {
+    char *home = getenv("HOME");
+    char *save_file = "dungeon";
+    char *game_dir = ".rlg327";
+    char *path = malloc(strlen(home) + strlen(game_dir) + strlen(save_file) + 3);
+    sprintf(path, "%s/%s/%s/", home, game_dir, save_file);
+
+    if (!strcmp("--save", argv[1]) || !strcmp("--save", argv[2]))
+    {
+      int version =0;
+      int32_t to_write = htobe32(version);
+      //fwrite(&to_write,4,1,f);
+      /*
+      //if --save is argv[1] or argv[2]
+      */
+    }
+    if (!strcmp("--load", argv[1]) || !strcmp("--load", argv[2]))
+    {
+      int32_t read_valve;
+      int version;
+      //fread(&read_valve, 4,1, f);
+      /*
+      //if --load is argv[1] or argv[2]
+      */
     }
   }
   makeRooms(rooms);
@@ -84,37 +114,49 @@ void fillArrayRoom(int topX, int topY, int botX, int botY)
 }
 void buildCorridors(struct room *rooms)
 {
-  int num_corr = rand()%6 +6;
+  int num_corr = rand() % 6 + 6;
   for (int i = 0; i < num_corr; i++)
   {
-    int startX = rooms[i%6].x;
-    int endX = rooms[(i + 1)%6].x;
-    int startY = rooms[i%6].y;
-    int endY = rooms[(i + 1)% 6].y;
-    if(startX> endX){
-      for(startX; startX>endX; startX--){
-        if(dung[startY][startX] == ' '){
+    int startX = rooms[i % 6].x;
+    int endX = rooms[(i + 1) % 6].x;
+    int startY = rooms[i % 6].y;
+    int endY = rooms[(i + 1) % 6].y;
+    if (startX > endX)
+    {
+      for (startX; startX > endX; startX--)
+      {
+        if (dung[startY][startX] == ' ')
+        {
           dung[startY][startX] = '#';
         }
       }
     }
-    if(startX< endX){
-      for(startX; startX<endX; startX++){
-        if(dung[startY][startX] == ' '){
+    if (startX < endX)
+    {
+      for (startX; startX < endX; startX++)
+      {
+        if (dung[startY][startX] == ' ')
+        {
           dung[startY][startX] = '#';
         }
       }
     }
-    if(startY> endY){
-      for(startY; startY>endY; startY--){
-        if(dung[startY][startX] == ' '){
+    if (startY > endY)
+    {
+      for (startY; startY > endY; startY--)
+      {
+        if (dung[startY][startX] == ' ')
+        {
           dung[startY][startX] = '#';
         }
       }
     }
-    if(startY< endY){
-      for(startY; startY<endY; startY++){
-        if(dung[startY][startX] == ' '){
+    if (startY < endY)
+    {
+      for (startY; startY < endY; startY++)
+      {
+        if (dung[startY][startX] == ' ')
+        {
           dung[startY][startX] = '#';
         }
       }
