@@ -1,5 +1,0 @@
-# ComS327Assignment
-Andrew Pester		apester@iastate.edu
-Kerstin schecterle	kerstin@iastate.edu
-
-This program randomly generates dungeons with six rooms, random amounts of corridors going between rooms and a stair case up and down. The six rooms are restricted to spawn of only a certain size and within a localized area.
