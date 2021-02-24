@@ -36,6 +36,13 @@ typedef struct corridor_path {
   int32_t cost;
 } corridor_path_t;
 
+typedef struct non_tunnel {
+  heap_node_t *hn;
+  uint8_t pos[2];
+  uint8_t from[2];
+  int32_t cost;
+} non_tunnel_t;
+
 typedef enum dim {
   dim_x,
   dim_y,
@@ -92,6 +99,7 @@ typedef struct dungeon {
    * and pulling in unnecessary data with each map cell would add a lot   *
    * of overhead to the memory system.                                    */
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
+  non_tunnel_t non_tunnel[DUNGEON_Y][DUNGEON_X];
   pair_t pc;
 } dungeon_t;
 
@@ -1230,22 +1238,116 @@ void usage(char *name)
 
   exit(-1);
 }
-/*
-this is the new methods
-*/
-typedef struct non_tunnel {
-  heap_node_t *hn;
-  uint8_t pos[2];
-  uint8_t from[2];
-  int32_t cost;
-}non_tunnel_t;
-
-static int32_t non_tunnel_cmp(const void *key, const void *with){
-  return ((non_tunnel_t*)key)->cost - ((non_tunnel_t *) with)->cost;
+/**
+ * this is the beginning of new fuctions
+ * */
+static int32_t non_tunneler_cmp(const void *key, const void *with) {
+  return ((non_tunnel_t *) key)->cost - ((non_tunnel_t *) with)->cost;
 }
-void non_tunneling(dungeon_t *d, int pcX, int pcY){
 
+static void non_tunneler(dungeon_t *d)
+{
+  static non_tunnel_t path[DUNGEON_Y][DUNGEON_X], *p;
+  static uint32_t initialized = 0;
+  heap_t h;
+  uint32_t x, y;
+
+  if (!initialized) {
+    for (y = 0; y < DUNGEON_Y; y++) {
+      for (x = 0; x < DUNGEON_X; x++) {
+        path[y][x].pos[dim_y] = y;
+        path[y][x].pos[dim_x] = x;
+      }
+    }
+    initialized = 1;
+  }
+  
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      path[y][x].cost = INT_MAX;
+    }
+  }
+
+  path[d->pc[1]][d->pc[0]].cost = 0;
+
+  heap_init(&h, non_tunneler_cmp, NULL);
+
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if (mapxy(x, y) == 0) {
+        path[y][x].hn = heap_insert(&h, &path[y][x]);
+      } else {
+        path[y][x].hn = NULL;
+      }
+    }
+  }
+
+  while ((p = heap_remove_min(&h))) {
+    p->hn = NULL;
+
+
+    if ((path[p->pos[dim_y] - 1][p->pos[dim_x]    ].hn) &&
+        (path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost >
+         p->cost + 1)) {
+      path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost =
+        p->cost + 1;
+      path[p->pos[dim_y] - 1][p->pos[dim_x]    ].from[dim_y] = p->pos[dim_y];
+      path[p->pos[dim_y] - 1][p->pos[dim_x]    ].from[dim_x] = p->pos[dim_x];
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1]
+                                           [p->pos[dim_x]    ].hn);
+    }
+    if ((path[p->pos[dim_y]    ][p->pos[dim_x] - 1].hn) &&
+        (path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost >
+         p->cost + 1)) {
+      path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost =
+        p->cost + 1;
+      path[p->pos[dim_y]    ][p->pos[dim_x] - 1].from[dim_y] = p->pos[dim_y];
+      path[p->pos[dim_y]    ][p->pos[dim_x] - 1].from[dim_x] = p->pos[dim_x];
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
+                                           [p->pos[dim_x] - 1].hn);
+    }
+    if ((path[p->pos[dim_y]    ][p->pos[dim_x] + 1].hn) &&
+        (path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost >
+         p->cost + 1)) {
+      path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost =
+        p->cost + 1;
+      path[p->pos[dim_y]    ][p->pos[dim_x] + 1].from[dim_y] = p->pos[dim_y];
+      path[p->pos[dim_y]    ][p->pos[dim_x] + 1].from[dim_x] = p->pos[dim_x];
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ]
+                                           [p->pos[dim_x] + 1].hn);
+    }
+    if ((path[p->pos[dim_y] + 1][p->pos[dim_x]    ].hn) &&
+        (path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost >
+         p->cost + 1)) {
+      path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost =
+        p->cost + 1;
+      path[p->pos[dim_y] + 1][p->pos[dim_x]    ].from[dim_y] = p->pos[dim_y];
+      path[p->pos[dim_y] + 1][p->pos[dim_x]    ].from[dim_x] = p->pos[dim_x];
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1]
+                                           [p->pos[dim_x]    ].hn);
+    }
+  }
+  //this does print the position of the character correctly but doesn't print out the cost for some reason
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if(y == d->pc[1] && x == d->pc[0]){
+        printf("%c", '@');
+      }else if(path[y][x].cost == 0){
+	      printf("%d", path[y][x].cost % 10);
+      }else{
+        printf("%c", ' ');
+      }
+
+    }
+    printf("\n");
+  }
 }
+
+
+
+
+
+
 int main(int argc, char *argv[])
 {
   dungeon_t d;
@@ -1381,6 +1483,8 @@ int main(int argc, char *argv[])
   }
 
   render_dungeon(&d);
+
+  non_tunneler(&d);
 
   if (do_save) {
     if (do_save_seed) {
