@@ -1,0 +1,4 @@
+My implementation of the dungeon project is built off the code of Prof. Sheaffer 
+and takes --save and --load switches as well as the short hand -s and -l for saving and loading.
+When called with no parameters it will create a brand new dungeon with randomly generated dungeon
+with a random number of rooms and corridors connecting them all together. 

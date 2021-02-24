@@ -1230,7 +1230,22 @@ void usage(char *name)
 
   exit(-1);
 }
+/*
+this is the new methods
+*/
+typedef struct non_tunnel {
+  heap_node_t *hn;
+  uint8_t pos[2];
+  uint8_t from[2];
+  int32_t cost;
+}non_tunnel_t;
 
+static int32_t non_tunnel_cmp(const void *key, const void *with){
+  return ((non_tunnel_t*)key)->cost - ((non_tunnel_t *) with)->cost;
+}
+void non_tunneling(dungeon_t *d, int pcX, int pcY){
+
+}
 int main(int argc, char *argv[])
 {
   dungeon_t d;
