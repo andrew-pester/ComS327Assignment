@@ -43,6 +43,17 @@ typedef struct pc {
   pair_t position;
 } pc_t;
 
+typedef struct monster{
+  heap_node_t *hn;
+  pair_t pos;
+  pair_t next_pos;
+  pair_t last_known;
+  char type;
+  uint8_t speed;
+  int turn;
+  int id;
+}monster_t;
+
 typedef struct dungeon {
   uint32_t num_rooms;
   room_t *rooms;
@@ -58,12 +69,13 @@ typedef struct dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
+  monster_t monster[DUNGEON_Y][DUNGEON_X];
   pc_t pc;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
 void delete_dungeon(dungeon_t *d);
-int gen_dungeon(dungeon_t *d);
+int gen_dungeon(dungeon_t *d, int nummon);
 void render_dungeon(dungeon_t *d);
 int write_dungeon(dungeon_t *d, char *file);
 int read_dungeon(dungeon_t *d, char *file);
@@ -72,5 +84,7 @@ void render_distance_map(dungeon_t *d);
 void render_tunnel_distance_map(dungeon_t *d);
 void render_hardness_map(dungeon_t *d);
 void render_movement_cost_map(dungeon_t *d);
+void generate_monsters(dungeon_t *d, int nummon);
+uint32_t in_room(dungeon_t *d, int16_t y, int16_t x, int16_t yM, int16_t xM);
 
 #endif
