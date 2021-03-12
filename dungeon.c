@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
+#include <ncurses.h>
 
 #include "heap.h"
 #include "dungeon.h"
@@ -611,7 +612,7 @@ static int make_rooms(dungeon_t *d)
 int gen_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);
-
+  d->quit = 0;
   do {
     make_rooms(d);
   } while (place_rooms(d));
@@ -619,49 +620,6 @@ int gen_dungeon(dungeon_t *d)
   place_stairs(d);
 
   return 0;
-}
-
-void render_dungeon(dungeon_t *d)
-{
-  pair_t p;
-
-  putchar('\n');
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (charpair(p)) {
-        putchar(charpair(p)->symbol);
-      } else {
-        switch (mappair(p)) {
-        case ter_wall:
-        case ter_wall_immutable:
-          putchar(' ');
-          break;
-        case ter_floor:
-        case ter_floor_room:
-          putchar('.');
-          break;
-        case ter_floor_hall:
-          putchar('#');
-          break;
-        case ter_debug:
-          putchar('*');
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
-          break;
-        case ter_stairs_up:
-          putchar('<');
-          break;
-        case ter_stairs_down:
-          putchar('>');
-          break;
-        default:
-          break;
-        }
-      }
-    }
-    putchar('\n');
-  }
-  putchar('\n');
-  putchar('\n');
 }
 
 void delete_dungeon(dungeon_t *d)
