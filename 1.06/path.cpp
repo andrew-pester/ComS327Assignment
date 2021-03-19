@@ -71,7 +71,7 @@ void dijkstra(dungeon_t *d)
     }
   }
 
-  while ((c = heap_remove_min(&h))) {
+  while ((c = (path_t*)heap_remove_min(&h))) {
     c->hn = NULL;
     if ((p[c->pos[dim_y] - 1][c->pos[dim_x] - 1].hn) &&
         (d->pc_distance[c->pos[dim_y] - 1][c->pos[dim_x] - 1] >
@@ -152,8 +152,8 @@ void dijkstra_tunnel(dungeon_t *d)
    * need to be modified for tunneling and pass-wall monsters.  */
 
   heap_t h;
-  uint32_t x, y;
-  int size;
+  int32_t x, y;
+  uint size;
   static path_t p[DUNGEON_Y][DUNGEON_X], *c;
   static uint32_t initialized = 0;
 
@@ -186,7 +186,7 @@ void dijkstra_tunnel(dungeon_t *d)
   }
 
   size = h.size;
-  while ((c = heap_remove_min(&h))) {
+  while ((c = (path_t*)heap_remove_min(&h))) {
     if (--size != h.size) {
       exit(1);
     }

@@ -48,7 +48,7 @@ typedef struct room {
 } room_t;
 
 typedef struct dungeon {
-  uint32_t num_rooms;
+  int32_t num_rooms;
   room_t *rooms;
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
   /* Since hardness is usually not used, it would be expensive to pull it *

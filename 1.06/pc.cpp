@@ -40,7 +40,7 @@ void config_pc(dungeon_t *d)
   d->pc.speed = PC_SPEED;
   d->pc.alive = 1;
   d->pc.sequence_number = 0;
-  d->pc.pc = calloc(1, sizeof (*d->pc.pc));
+  d->pc.pc = (pc_t*)calloc(1, sizeof (*d->pc.pc));
   d->pc.npc = NULL;
   d->pc.kills[kill_direct] = d->pc.kills[kill_avenged] = 0;
 
@@ -148,7 +148,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
   return 0;
 }
 
-uint32_t pc_in_room(dungeon_t *d, uint32_t room)
+uint32_t pc_in_room(dungeon_t *d, int32_t room)
 {
   if ((room < d->num_rooms)                                     &&
       (d->pc.position[dim_x] >= d->rooms[room].position[dim_x]) &&

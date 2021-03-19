@@ -37,6 +37,6 @@ typedef struct character {
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
 uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist);
-void character_delete(void *c);
+void character_delete(character *c); 
 
 #endif
