@@ -32,7 +32,8 @@ void place_pc(dungeon *d)
 
 void config_pc(dungeon *d)
 {
-  memset(&d->PC, 0, sizeof (d->PC));
+  d->PC = new pc;
+  memset(d->PC, 0, sizeof (*d->PC));
   d->PC->symbol = '@';
 
   place_pc(d);
