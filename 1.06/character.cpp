@@ -13,7 +13,7 @@ void character_delete(character *c)
   delete c;
 }
 
-uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)
+uint32_t can_see(dungeon *d, character *voyeur, character *exhibitionist)
 {
   /* Application of Bresenham's Line Drawing Algorithm.  If we can draw *
    * a line from v to e without intersecting any walls, then v can see  *

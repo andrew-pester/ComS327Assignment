@@ -76,7 +76,7 @@ void usage(char *name)
 
 int main(int argc, char *argv[])
 {
-  dungeon_t d;
+  dungeon d;
   time_t seed;
   struct timeval tv;
   int32_t i;
@@ -250,11 +250,12 @@ int main(int argc, char *argv[])
   }
 
   printf("%s", pc_is_alive(&d) ? victory : tombstone);
+  /*
   printf("You defended your life in the face of %u deadly beasts.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
-         d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
-
+         d->pc->kills[kill_direct], d->pc->kills[kill_avenged]);
+  */
   //fixes segmentation fault must actually free them though as this isn't desired
   //pc_delete(d.pc.pc);
 
