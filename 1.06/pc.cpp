@@ -11,7 +11,7 @@
 void pc_delete(pc *pc)
 {
   if (pc) {
-    free(pc);
+    delete pc;
   }
 }
 

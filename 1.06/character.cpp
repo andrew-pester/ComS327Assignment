@@ -9,8 +9,10 @@
 
 void character_delete(character *c)
 {
+  if(c){
+    delete c;
+  }
 
-  delete c;
 }
 
 uint32_t can_see(dungeon *d, character *voyeur, character *exhibitionist)

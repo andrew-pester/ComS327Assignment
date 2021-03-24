@@ -13,7 +13,7 @@
 void npc_delete(npc *n)
 {
   if (n) {
-    free(n);
+    delete n;
   }
 }
 
@@ -48,7 +48,7 @@ void gen_monsters(dungeon *d)
   d->num_monsters = min(d->max_monsters, max_monster_cells(d));
 
   for (i = 0; i < d->num_monsters; i++) {
-    m = (character*)malloc(sizeof (*m));
+    m = new npc;
     memset(m, 0, sizeof (*m));
 
     do {
