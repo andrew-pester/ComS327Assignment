@@ -43,7 +43,7 @@ void gen_monsters(dungeon *d)
   character *m;
   uint32_t room;
   pair_t p;
-  //const static char symbol[] = "0123456789abcdef";
+  const static char symbol[] = "0123456789abcdef";
 
   d->num_monsters = min(d->max_monsters, max_monster_cells(d));
 
@@ -65,6 +65,7 @@ void gen_monsters(dungeon *d)
     d->characters[p[dim_y]][p[dim_x]] = m;
     m->speed = rand_range(NPC_MIN_SPEED, NPC_MAX_SPEED);
     m->alive = 1;
+    m->symbol = symbol[rand_range(0,15)];
     m->sequence_number = ++d->character_sequence_number;
     m->kills[kill_direct] = m->kills[kill_avenged] = 0;
 
