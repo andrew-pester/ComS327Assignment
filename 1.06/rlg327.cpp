@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
   }
 
-  /* Ignoring PC position in saved dungeons.  Not a bug. */
+  /* Ignoring player position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
 
@@ -250,16 +250,16 @@ int main(int argc, char *argv[])
   }
 
   printf("%s", pc_is_alive(&d) ? victory : tombstone);
-  /*
+  
   printf("You defended your life in the face of %u deadly beasts.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
-         d->pc->kills[kill_direct], d->pc->kills[kill_avenged]);
-  */
-  //fixes segmentation fault must actually free them though as this isn't desired
-  //pc_delete(d.pc.pc);
+         d.player->kills[kill_direct], d.player->kills[kill_avenged]);
+  
+  //fixes double free issue
+  //pc_delete(d.player);
 
-  //delete_dungeon(&d);
+  delete_dungeon(&d);
 
   return 0;
 }

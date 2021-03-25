@@ -55,7 +55,7 @@ void do_combat(dungeon *d, character *atk, character *def)
     def->alive = 0;
     charpair(def->position) = NULL;
     
-    if (def != d->PC) {
+    if (def != d->player) {
       d->num_monsters--;
     } else {
       if ((part = rand() % (sizeof (organs) / sizeof (organs[0]))) < 26) {
@@ -76,14 +76,14 @@ void do_combat(dungeon *d, character *atk, character *def)
                                   def->kills[kill_avenged]);
   }
 
-  if (atk == d->PC) {
+  if (atk == d->player) {
     io_queue_message("You smite the %c!", def->symbol);
   }
 
-  can_see_atk = can_see(d, d->PC, atk);
-  can_see_def = can_see(d, d->PC, def);
+  can_see_atk = can_see(d, d->player, atk);
+  can_see_def = can_see(d, d->player, def);
 
-  if (atk != d->PC && def != d->PC) {
+  if (atk != d->player && def != d->player) {
     if (can_see_atk && !can_see_def) {
       io_queue_message("The %c callously murders some poor, "
                        "defenseless creature.", atk->symbol);
@@ -120,32 +120,32 @@ void do_moves(dungeon *d)
   character *c;
   event *e;
 
-  /* Remove the PC when it is PC turn.  Replace on next call.  This allows *
+  /* Remove the player when it is player turn.  Replace on next call.  This allows *
    * use to completely uninit the heap when generating a new level without *
-   * worrying about deleting the PC.                                       */
+   * worrying about deleting the player.                                       */
 
   if (pc_is_alive(d)) {
-    /* The PC always goes first one a tie, so we don't use new_event().  *
-     * We generate one manually so that we can set the PC sequence       *
+    /* The player always goes first one a tie, so we don't use new_event().  *
+     * We generate one manually so that we can set the player sequence       *
      * number to zero.                                                   */
     e = (event*)malloc(sizeof (*e));
     e->type = event_character_turn;
-    /* Hack: New dungeons are marked.  Unmark and ensure PC goes at d->time, *
-     * otherwise, monsters get a turn before the PC.                         */
+    /* Hack: New dungeons are marked.  Unmark and ensure player goes at d->time, *
+     * otherwise, monsters get a turn before the player.                         */
     if (d->is_new) {
       d->is_new = 0;
       e->time = d->time;
     } else {
-      e->time = d->time + (1000 / d->PC->speed);
+      e->time = d->time + (1000 / d->player->speed);
     }
     e->sequence = 0;
-    e->c = d->PC;
+    e->c = d->player;
     heap_insert(&d->events, e);
   }
 
   while (pc_is_alive(d) &&
          (e = (event*)heap_remove_min(&d->events)) &&
-         ((e->type != event_character_turn) || (e->c != d->PC))) {
+         ((e->type != event_character_turn) || (e->c != d->player))) {
     d->time = e->time;
     if (e->type == event_character_turn) {
       c = e->c;
@@ -154,7 +154,7 @@ void do_moves(dungeon *d)
       if (d->characters[c->position[dim_y]][c->position[dim_x]] == c) {
         d->characters[c->position[dim_y]][c->position[dim_x]] = NULL;
       }
-      if (c != d->PC) {
+      if (c != d->player) {
         event_delete(e);
       }
       continue;
@@ -167,11 +167,11 @@ void do_moves(dungeon *d)
   }
 
   io_display(d);
-  if (pc_is_alive(d) && e->c == d->PC) {
+  if (pc_is_alive(d) && e->c == d->player) {
     c = e->c;
     d->time = e->time;
-    /* Kind of kludgey, but because the PC is never in the queue when   *
-     * we are outside of this function, the PC event has to get deleted *
+    /* Kind of kludgey, but because the player is never in the queue when   *
+     * we are outside of this function, the player event has to get deleted *
      * and recreated every time we leave and re-enter this function.    */
     e->c = NULL;
     event_delete(e);
@@ -251,8 +251,8 @@ uint32_t move_pc(dungeon *d, uint32_t dir)
     "Are you drunk?"
   };
 
-  next[dim_y] = d->PC->position[dim_y];
-  next[dim_x] = d->PC->position[dim_x];
+  next[dim_y] = d->player->position[dim_y];
+  next[dim_x] = d->player->position[dim_x];
 
 
   switch (dir) {
@@ -287,13 +287,13 @@ uint32_t move_pc(dungeon *d, uint32_t dir)
     next[dim_x]++;
     break;
   case '<':
-    if (mappair(d->PC->position) == ter_stairs_up) {
+    if (mappair(d->player->position) == ter_stairs_up) {
       was_stairs = 1;
       new_dungeon_level(d, '<');
     }
     break;
   case '>':
-    if (mappair(d->PC->position) == ter_stairs_down) {
+    if (mappair(d->player->position) == ter_stairs_down) {
       was_stairs = 1;
       new_dungeon_level(d, '>');
     }
@@ -305,7 +305,7 @@ uint32_t move_pc(dungeon *d, uint32_t dir)
   }
 
   if ((dir != '>') && (dir != '<') && (mappair(next) >= ter_floor)) {
-    move_character(d, d->PC, next);
+    move_character(d, d->player, next);
     dijkstra(d);
     dijkstra_tunnel(d);
 

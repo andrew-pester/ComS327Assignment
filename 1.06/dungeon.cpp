@@ -785,7 +785,7 @@ int write_stairs(dungeon *d, FILE *f)
 uint32_t calculate_dungeon_size(dungeon *d)
 {
   /* Per the spec, 1708 is 12 byte semantic marker + 4 byte file verion + *
-   * 4 byte file size + 2 byte PC position + 1680 byte hardness array +   *
+   * 4 byte file size + 2 byte player position + 1680 byte hardness array +   *
    * 2 byte each number of rooms, number of up stairs, number of down     *
    * stairs.                                                              */
   return (1708 + (d->num_rooms * 4) +
@@ -841,9 +841,9 @@ int write_dungeon(dungeon *d, char *file)
   be32 = htobe32(calculate_dungeon_size(d));
   fwrite(&be32, sizeof (be32), 1, f);
 
-  /* The PC position, 2 bytes, 20-21 */
-  fwrite(&d->PC->position[dim_x], 1, 1, f);
-  fwrite(&d->PC->position[dim_y], 1, 1, f);
+  /* The player position, 2 bytes, 20-21 */
+  fwrite(&d->player->position[dim_x], 1, 1, f);
+  fwrite(&d->player->position[dim_y], 1, 1, f);
 
   /* The dungeon map, 1680 bytes, 22-1702 */
   write_dungeon_map(d, f);
@@ -1029,8 +1029,8 @@ int read_dungeon(dungeon *d, char *file)
     exit(-1);
   }
 
-  fread(&d->PC->position[dim_x], 1, 1, f);
-  fread(&d->PC->position[dim_y], 1, 1, f);
+  fread(&d->player->position[dim_x], 1, 1, f);
+  fread(&d->player->position[dim_y], 1, 1, f);
   
   read_dungeon_map(d, f);
 
@@ -1043,7 +1043,7 @@ int read_dungeon(dungeon *d, char *file)
   return 0;
 }
 
-/* PGM dungeon descriptions do not support PC or stairs */
+/* PGM dungeon descriptions do not support player or stairs */
 int read_pgm(dungeon *d, char *pgm)
 {
   FILE *f;
@@ -1159,8 +1159,8 @@ void render_movement_cost_map(dungeon *d)
   putchar('\n');
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->PC->position[dim_x] &&
-          p[dim_y] ==  d->PC->position[dim_y]) {
+      if (p[dim_x] ==  d->player->position[dim_x] &&
+          p[dim_y] ==  d->player->position[dim_y]) {
         putchar('@');
       } else {
         if (hardnesspair(p) == 255) {
@@ -1180,8 +1180,8 @@ void render_distance_map(dungeon *d)
 
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->PC->position[dim_x] &&
-          p[dim_y] ==  d->PC->position[dim_y]) {
+      if (p[dim_x] ==  d->player->position[dim_x] &&
+          p[dim_y] ==  d->player->position[dim_y]) {
         putchar('@');
       } else {
         switch (mappair(p)) {
@@ -1219,8 +1219,8 @@ void render_tunnel_distance_map(dungeon *d)
 
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->PC->position[dim_x] &&
-          p[dim_y] ==  d->PC->position[dim_y]) {
+      if (p[dim_x] ==  d->player->position[dim_x] &&
+          p[dim_y] ==  d->player->position[dim_y]) {
         putchar('@');
       } else {
         switch (mappair(p)) {
@@ -1265,7 +1265,7 @@ void new_dungeon(dungeon *d)
   d->character_sequence_number = sequence_number;
 
   place_pc(d);
-  d->characters[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC;
+  d->characters[d->player->position[dim_y]][d->player->position[dim_x]] = d->player;
 
   gen_monsters(d);
 }

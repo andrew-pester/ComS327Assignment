@@ -40,7 +40,7 @@ static uint32_t max_monster_cells(dungeon *d)
 void gen_monsters(dungeon *d)
 {
   uint32_t i;
-  character *m;
+  npc *m;
   uint32_t room;
   pair_t p;
   const static char symbol[] = "0123456789abcdef";
@@ -65,12 +65,13 @@ void gen_monsters(dungeon *d)
     d->characters[p[dim_y]][p[dim_x]] = m;
     m->speed = rand_range(NPC_MIN_SPEED, NPC_MAX_SPEED);
     m->alive = 1;
-    m->symbol = symbol[rand_range(0,15)];
     m->sequence_number = ++d->character_sequence_number;
     m->kills[kill_direct] = m->kills[kill_avenged] = 0;
-
     d->characters[p[dim_y]][p[dim_x]] = m;
-
+    m->characteristics = rand() & 0x0000000f;
+    m->symbol = symbol[m->characteristics];
+    m->have_seen_pc = 0;
+    m->kills[kill_direct] = m->kills[kill_avenged] = 0;
     heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
   }
 }
@@ -156,8 +157,8 @@ void npc_next_pos_line_of_sight(dungeon *d, character *c, pair_t next)
 {
   pair_t dir;
 
-  dir[dim_y] = d->PC->position[dim_y] - c->position[dim_y];
-  dir[dim_x] = d->PC->position[dim_x] - c->position[dim_x];
+  dir[dim_y] = d->player->position[dim_y] - c->position[dim_y];
+  dir[dim_x] = d->player->position[dim_x] - c->position[dim_x];
   if (dir[dim_y]) {
     dir[dim_y] /= abs(dir[dim_y]);
   }
@@ -182,8 +183,8 @@ void npc_next_pos_line_of_sight_tunnel(dungeon *d,
 {
   pair_t dir;
 
-  dir[dim_y] = d->PC->position[dim_y] - c->position[dim_y];
-  dir[dim_x] = d->PC->position[dim_x] - c->position[dim_x];
+  dir[dim_y] = d->player->position[dim_y] - c->position[dim_y];
+  dir[dim_x] = d->player->position[dim_x] - c->position[dim_x];
   if (dir[dim_y]) {
     dir[dim_y] /= abs(dir[dim_y]);
   }
@@ -337,9 +338,9 @@ void npc_next_pos_gradient(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_00(dungeon *d, npc *c, pair_t next)
 {
   /* not smart; not telepathic; not tunneling; not erratic */
-  if (can_see(d, c, d->PC)) {
-    c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-    c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  if (can_see(d, c, d->player)) {
+    c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+    c->pc_last_known_position[dim_x] = d->player->position[dim_x];
     npc_next_pos_line_of_sight(d, c, next);
   } else {
     npc_next_pos_rand(d, c, next);
@@ -349,9 +350,9 @@ static void npc_next_pos_00(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_01(dungeon *d, npc *c, pair_t next)
 {
   /*     smart; not telepathic; not tunneling; not erratic */
-  if (can_see(d, c, d->PC)) {
-    c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-    c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  if (can_see(d, c, d->player)) {
+    c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+    c->pc_last_known_position[dim_x] = d->player->position[dim_x];
     c->have_seen_pc = 1;
     npc_next_pos_line_of_sight(d, c, next);
   } else if (c->have_seen_pc) {
@@ -368,8 +369,8 @@ static void npc_next_pos_01(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_02(dungeon *d, npc *c, pair_t next)
 {
   /* not smart;     telepathic; not tunneling; not erratic */
-  c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-  c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+  c->pc_last_known_position[dim_x] = d->player->position[dim_x];
   npc_next_pos_line_of_sight(d, c, next);
 }
 
@@ -382,9 +383,9 @@ static void npc_next_pos_03(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_04(dungeon *d, npc *c, pair_t next)
 {
   /* not smart; not telepathic;     tunneling; not erratic */
-  if (can_see(d, c, d->PC)) {
-    c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-    c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  if (can_see(d, c, d->player)) {
+    c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+    c->pc_last_known_position[dim_x] = d->player->position[dim_x];
     npc_next_pos_line_of_sight(d, c, next);
   } else {
     npc_next_pos_rand_tunnel(d, c, next);
@@ -394,9 +395,9 @@ static void npc_next_pos_04(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_05(dungeon *d, npc *c, pair_t next)
 {
   /*     smart; not telepathic;     tunneling; not erratic */
-  if (can_see(d, c, d->PC)) {
-    c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-    c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  if (can_see(d, c, d->player)) {
+    c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+    c->pc_last_known_position[dim_x] = d->player->position[dim_x];
     c->have_seen_pc = 1;
     npc_next_pos_line_of_sight(d, c, next);
   } else if (c->have_seen_pc) {
@@ -413,8 +414,8 @@ static void npc_next_pos_05(dungeon *d, npc *c, pair_t next)
 static void npc_next_pos_06(dungeon *d, npc *c, pair_t next)
 {
   /* not smart;     telepathic;     tunneling; not erratic */
-  c->pc_last_known_position[dim_y] = d->PC->position[dim_y];
-  c->pc_last_known_position[dim_x] = d->PC->position[dim_x];
+  c->pc_last_known_position[dim_y] = d->player->position[dim_y];
+  c->pc_last_known_position[dim_x] = d->player->position[dim_x];
   npc_next_pos_line_of_sight_tunnel(d, c, next);
 }
 
@@ -428,7 +429,7 @@ static void npc_next_pos_erratic(dungeon *d, npc *c, pair_t next);
 
 void (*npc_move_func[])(dungeon *d, npc *c, pair_t next) = {
   /* We'll have one function for each combination of bits, so the *
-   * order is based on binary counting through the NPC_* bits.    *
+   * order is based on binary counting through the Nplayer_* bits.    *
    * It could be very easy to mess this up, so be careful.  We'll *
    * name them according to their hex value.                      */
   npc_next_pos_00,

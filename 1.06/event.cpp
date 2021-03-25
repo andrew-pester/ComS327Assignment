@@ -8,8 +8,8 @@ static uint32_t next_event_number(void)
 {
   static uint32_t sequence_number;
 
-  /* We need to special case the first PC insert, because monsters go *
-   * into the queue before the PC.  Pre-increment ensures that this   *
+  /* We need to special case the first player insert, because monsters go *
+   * into the queue before the player.  Pre-increment ensures that this   *
    * starts at 1, so we can use a zero there.                         */
   return ++sequence_number;
 }
