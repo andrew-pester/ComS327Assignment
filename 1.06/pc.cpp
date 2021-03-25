@@ -198,3 +198,30 @@ void reset_visited(dungeon *d){
     }
   }
 }
+int character_within_range(character *c, dungeon *d){
+  int xmin= 0, xmax=0, ymin=0, ymax=0;
+  xmin = d->player->position[dim_x]-3;
+  if(xmin<0){
+    xmin = 0;
+  }
+  xmax = d->player->position[dim_x]+3;
+  if(xmax>DUNGEON_X){
+    xmax = DUNGEON_X;
+  }
+  ymin = d->player->position[dim_y]-2;
+  if(ymin<0){
+    ymin = 0;
+  }
+  ymax = d->player->position[dim_y]+3;
+  if(ymax>DUNGEON_Y){
+    ymax = DUNGEON_Y;
+  }
+  for(int i = ymin; i<ymax;i++){
+    for(int j = xmin; j<xmax;j++){
+      if(c->position[dim_x] == j  && c->position[dim_y] == i){
+        return 1;
+      }
+    }
+  }
+  return 0;
+}

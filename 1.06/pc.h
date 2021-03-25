@@ -18,5 +18,6 @@ uint32_t pc_next_pos(dungeon *d, pair_t dir);
 void place_pc(dungeon *d);
 uint32_t pc_in_room(dungeon *d, int32_t room);
 void reset_visited(dungeon *d);
+int character_within_range(character *c, dungeon *d);
 
 #endif

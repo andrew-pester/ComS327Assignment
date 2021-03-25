@@ -235,7 +235,7 @@ void io_display(dungeon *d)
   {
     for (x = 0; x < 80; x++)
     {
-      if (d->player->visited[y][x] != ter_wall &&d->characters[y][x])
+      if (d->player->visited[y][x] != ter_wall && d->characters[y][x] && character_within_range(d->characters[y][x],d))
       {
         mvaddch(y + 1, x, d->characters[y][x]->symbol);
       }
