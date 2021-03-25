@@ -169,7 +169,7 @@ uint32_t pc_in_room(dungeon *d, int32_t room)
 }
 void pc_visited(dungeon *d){
   int xmin= 0, xmax=0, ymin=0, ymax=0;
-  xmin = d->player->position[dim_x]-3;
+  xmin = d->player->position[dim_x]-2;
   if(xmin<0){
     xmin = 0;
   }
@@ -200,7 +200,7 @@ void reset_visited(dungeon *d){
 }
 int character_within_range(character *c, dungeon *d){
   int xmin= 0, xmax=0, ymin=0, ymax=0;
-  xmin = d->player->position[dim_x]-3;
+  xmin = d->player->position[dim_x]-2;
   if(xmin<0){
     xmin = 0;
   }
