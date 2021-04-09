@@ -55,6 +55,7 @@ typedef struct room {
 } room_t;
 
 class pc;
+class object;
 
 class dungeon {
  public:
@@ -77,6 +78,7 @@ class dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
+  object * object_map[DUNGEON_Y][DUNGEON_X];
   character *character_map[DUNGEON_Y][DUNGEON_X];
   pc *PC;
   heap_t events;

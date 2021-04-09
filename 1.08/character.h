@@ -2,6 +2,7 @@
 # define CHARACTER_H
 
 # include <stdint.h>
+# include <string>
 
 # include "dims.h"
 
@@ -11,12 +12,15 @@ typedef enum kill_type {
   num_kill_types
 } kill_type_t;
 
+
 class character {
  public:
+  virtual ~character(){}
   char symbol;
   pair_t position;
   int32_t speed;
   uint32_t alive;
+  uint32_t color;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
    * an event queue, there's no need for that here.  Instead it's in the    *
    * event.  Similarly, sequence_number was introduced in order to ensure   *

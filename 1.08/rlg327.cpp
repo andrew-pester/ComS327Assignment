@@ -87,11 +87,8 @@ int main(int argc, char *argv[])
   char *pgm_file;
   
   parse_descriptions(&d);
-  print_descriptions(&d);
-  destroy_descriptions(&d);
+  // print_descriptions(&d);
 
-  return 0;
-  
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
@@ -265,6 +262,7 @@ int main(int argc, char *argv[])
     character_delete(d.PC);
   }
 
+  //destroy_descriptions(&d);
   delete_dungeon(&d);
 
   return 0;

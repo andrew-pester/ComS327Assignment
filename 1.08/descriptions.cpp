@@ -15,6 +15,7 @@
 #include "dice.h"
 #include "character.h"
 #include "utils.h"
+#include "event.h"
 
 #define MONSTER_FILE_SEMANTIC          "RLG327 MONSTER DESCRIPTION"
 #define MONSTER_FILE_VERSION           1U
@@ -1061,4 +1062,54 @@ return o << hit << std::endl << damage << std::endl << dodge << std::endl
 std::ostream &operator<<(std::ostream &o, object_description &od)
 {
   return od.print(o);
+}
+npc *monster_description::gen_monster(dungeon *d){
+  //Done
+  npc *m;
+  std::vector<monster_description> &md = d->monster_descriptions;
+  int tmp = 1;
+  int i = 0;
+  //tried doing this in npc.cpp and proved to be a pain checking here is easier
+  while(tmp){
+    //choose a random monster index
+    i = rand() % md.size();
+    //check if it is able to spawn i.e. has to do with unique
+    if(check_if_eligable_m(&md.at(i))){
+      tmp = 0;
+    }else if(md.at(i).rarity>=(unsigned)rand()%100){
+      tmp = 0;
+    }
+  }
+  md.at(i).is_alive();
+  m = new npc(d,md.at(i));
+  heap_insert(&d->events, new_event(d,event_character_turn, m,0));
+
+  return m;
+}
+
+int check_if_eligable_m(monster_description *m){
+  //Done
+
+//check if uniq if so check if it was alive and killed
+//have to store on monster description as the npc would lose this stuff 
+//when killed and descriptions for the dungeon are persistant
+  if((m->abilities & NPC_UNIQ) && !m->alive && !m->dead){
+    return 1;
+  }else if(!(m->abilities & NPC_UNIQ)){
+    return 1;
+  }else{
+    return 0;
+  }
+}
+int check_if_eligable_o(object_description *o){
+  //Done
+  //it will always not be ineligable unless already generated on this floor
+  // as i don't wanna implement picking stuff up
+  if(!(o->artifact)){
+    return 1;
+  }else if(o->artifact && !o->exists){
+    return 1;
+  }else{
+    return 0;
+  }
 }

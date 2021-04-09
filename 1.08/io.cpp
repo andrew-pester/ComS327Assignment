@@ -212,13 +212,28 @@ void io_display(dungeon *d)
       if ((illuminated = is_illuminated(d->PC, y, x))) {
         attron(A_BOLD);
       }
+      //colors for objects
+      // if (d->object_map[y][x] &&
+      //      can_see(d,
+      //             character_get_pos(d->PC),
+      //             character_get_pos(d->character_map[y][x]),
+      //             1, 0)) {
+      //               //change to actual monster colors
+      //               attron(COLOR_PAIR(d->object_map[y][x]->color));
+      //  mvaddch(y + 1, x,
+      //           character_get_symbol(d->character_map[y][x]));
+      //           attroff(COLOR_PAIR(d->object_map[y][x]->color));
+      //   visible_monsters++;
+      // }
       if (d->character_map[y][x] &&
            can_see(d,
                   character_get_pos(d->PC),
                   character_get_pos(d->character_map[y][x]),
                   1, 0)) {
+                    attron(COLOR_PAIR(d->character_map[y][x]->color));
        mvaddch(y + 1, x,
                 character_get_symbol(d->character_map[y][x]));
+                attroff(COLOR_PAIR(d->character_map[y][x]->color));
         visible_monsters++;
       } else {
         switch (pc_learned_terrain(d->PC, y, x)) {

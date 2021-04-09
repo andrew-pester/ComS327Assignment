@@ -6,6 +6,7 @@
 # include <vector>
 # include <string>
 # include "dice.h"
+#include "npc.h"
 
 typedef struct dungeon dungeon_t;
 
@@ -39,17 +40,18 @@ typedef enum object_type {
 extern const char object_symbol[];
 
 class monster_description {
- private:
+ public:
   std::string name, description;
   char symbol;
   std::vector<uint32_t> color;
   uint32_t abilities;
   dice speed, hitpoints, damage;
   uint32_t rarity;
- public:
+  int alive;
+  int dead;
   monster_description() : name(),       description(), symbol(0),   color(0),
                           abilities(0), speed(),       hitpoints(), damage(),
-                          rarity(0)
+                          rarity(0), alive(0), dead(0)
   {
   }
   void set(const std::string &name,
@@ -63,22 +65,26 @@ class monster_description {
            const uint32_t rarity);
   std::ostream &print(std::ostream &o);
   char get_symbol() { return symbol; }
+  static npc *gen_monster(dungeon_t *d);
+  inline void is_alive(){alive++;}
+  inline void remove_alive(){alive--;}
+  inline void is_dead(){dead++;}
 };
 
 class object_description {
- private:
+ public:
   std::string name, description;
   object_type_t type;
   uint32_t color;
   dice hit, damage, dodge, defence, weight, speed, attribute, value;
   bool artifact;
   uint32_t rarity;
- public:
+  int exists;
   object_description() : name(),    description(), type(objtype_no_type),
                          color(0),  hit(),         damage(),
                          dodge(),   defence(),     weight(),
                          speed(),   attribute(),   value(),
-                         artifact(false), rarity(0)
+                         artifact(false), rarity(0), exists(0)
   {
   }
   void set(const std::string &name,
@@ -110,9 +116,13 @@ class object_description {
   inline const dice &get_speed() const { return speed; }
   inline const dice &get_attribute() const { return attribute; }
   inline const dice &get_value() const { return value; }
+  inline void exists_() {exists++;}
+  inline void exists_x(){exists--;}
 };
 
 std::ostream &operator<<(std::ostream &o, monster_description &m);
 std::ostream &operator<<(std::ostream &o, object_description &od);
+int check_if_eligable_m(monster_description *m);
+int check_if_eligable_o(object_description *o);
 
 #endif
