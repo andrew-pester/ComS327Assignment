@@ -53,7 +53,6 @@ class npc : public character
 {
 public:
   npc(dungeon *d, monster_description &m);
-  ~npc();
   dice dam;
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;

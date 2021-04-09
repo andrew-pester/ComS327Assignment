@@ -4,6 +4,7 @@
 #include <string>
 #include "descriptions.h"
 #include "dims.h"
+#include "utils.h"
 
 class object {
     public:
@@ -22,12 +23,13 @@ class object {
     int32_t attr;
     int32_t val;
     pair_t pos;
+    char symbol;
     object_description &od;
-    object(object_description &od, pair_t p); 
+    object(object_description &od); 
     ~object(){od.exists_x();}
 };
 void gen_object(dungeon *d);
 void gen_objects(dungeon *d);
-
+int16_t *object_get_pos(object *o);
 
 #endif

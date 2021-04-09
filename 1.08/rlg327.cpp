@@ -10,6 +10,7 @@
 #include "move.h"
 #include "utils.h"
 #include "io.h"
+#include "objects.h"
 
 const char *victory =
   "\n                                       o\n"
@@ -213,6 +214,7 @@ int main(int argc, char *argv[])
   /* Ignoring PC position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
+  gen_objects(&d);
 
   io_display(&d);
   if (!do_load && !do_image) {

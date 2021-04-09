@@ -547,7 +547,3 @@ npc::npc(dungeon *d, monster_description &m): monster(m)
   have_seen_pc = 0;
   kills[kill_direct] = this->kills[kill_avenged] = 0;
 }
-//what is a Vtable and why was it angry until i added this
-npc::~npc(){
-
-}

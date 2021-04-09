@@ -36,6 +36,8 @@ void config_pc(dungeon *d)
   place_pc(d);
 
   d->PC->speed = PC_SPEED;
+  //i think this is just bold now but it looks nice
+  d->PC->color = 0U;
   d->PC->alive = 1;
   d->PC->sequence_number = 0;
   d->PC->kills[kill_direct] = d->PC->kills[kill_avenged] = 0;
