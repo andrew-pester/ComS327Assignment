@@ -1093,7 +1093,6 @@ int check_if_eligable_m(monster_description *m){
 //check if uniq if so check if it was alive and killed
 //have to store on monster description as the npc would lose this stuff 
 //when killed and descriptions for the dungeon are persistant
-//luckily found the weird bitwise operator thing in the npc.h so i could actually get this working
   if((m->abilities & NPC_UNIQ) && !m->alive && !m->dead){
     return 1;
   }else if(!(m->abilities & NPC_UNIQ)){

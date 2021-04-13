@@ -26,7 +26,6 @@ class object {
     char symbol;
     object_description &od;
     object(object_description &od); 
-    ~object(){od.exists_x();}
 };
 void gen_object(dungeon *d);
 void gen_objects(dungeon *d);
