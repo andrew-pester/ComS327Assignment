@@ -123,7 +123,7 @@ int32_t object::get_type()
 
 uint32_t object::is_equipable()
 {
-  return type >= objtype_WEAPON && type <= objtype_RING; 
+  return (type >= objtype_WEAPON && type <= objtype_RING)||type == objtype_WAND; 
 }
 
 uint32_t object::is_removable()
@@ -144,10 +144,12 @@ uint32_t object::is_destructable()
 int32_t object::get_eq_slot_index()
 {
   if (type < objtype_WEAPON ||
-      type > objtype_RING) {
+      (type > objtype_RING && type != objtype_WAND)) {
     return -1;
   }
-
+  if(type == objtype_WAND){
+    return objtype_RANGED-1;
+  }
   return type - 1;
 }
 

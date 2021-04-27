@@ -92,8 +92,8 @@ int main(int argc, char *argv[])
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
   do_seed = 1;
   save_file = load_file = NULL;
-  d.max_monsters = MAX_MONSTERS;
-  d.max_objects = MAX_OBJECTS;
+  d.max_monsters = 2;//MAX_MONSTERS;
+  d.max_objects = 50;//MAX_OBJECTS;
 
   /* The project spec requires '--load' and '--save'.  It's common  *
    * to have short and long forms of most switches (assuming you    *

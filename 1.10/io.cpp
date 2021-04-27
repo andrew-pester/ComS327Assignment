@@ -1476,6 +1476,201 @@ uint32_t io_expunge_in(dungeon *d)
 
   return 1;
 }
+static uint32_t io_ranged_attack(dungeon *d)
+{
+  //need to modify to use a ranged attack 
+  //check if it is a wand or a bow first
+  //depending on if it is a wand or a bow have a certain attack
+  uint32_t n;
+  pair_t dest, tmp;
+  int c;
+  fd_set readfs;
+  struct timeval tv;
+  char s[80];
+  const char *p;
+
+  io_display(d);
+
+  mvprintw(0, 0, "Select a tile & press r to attack a single target or c to use an AOE attack.");
+
+  dest[dim_y] = d->PC->position[dim_y];
+  dest[dim_x] = d->PC->position[dim_x];
+
+  mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+  refresh();
+
+  do {
+    do{
+      FD_ZERO(&readfs);
+      FD_SET(STDIN_FILENO, &readfs);
+
+      tv.tv_sec = 0;
+      tv.tv_usec = 125000; /* An eigth of a second */
+
+      io_redisplay_visible_monsters(d, dest);
+    } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
+    /* Can simply draw the terrain when we move the cursor away, *
+     * because if it is a character or object, the refresh       *
+     * function will fix it for us.                              */
+    switch (mappair(dest)) {
+    case ter_wall:
+    case ter_wall_immutable:
+    case ter_unknown:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], ' ');
+      break;
+    case ter_floor:
+    case ter_floor_room:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '.');
+      break;
+    case ter_floor_hall:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '#');
+      break;
+    case ter_debug:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+      break;
+    case ter_stairs_up:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '<');
+      break;
+    case ter_stairs_down:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '>');
+      break;
+    default:
+ /* Use zero as an error symbol, since it stands out somewhat, and it's *
+  * not otherwise used.                                                 */
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '0');
+    }
+    tmp[dim_y] = dest[dim_y];
+    tmp[dim_x] = dest[dim_x];
+    switch ((c = getch())) {
+    case '7':
+    case 'y':
+    case KEY_HOME:
+      tmp[dim_y]--;
+      tmp[dim_x]--;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    case '8':
+    case 'k':
+    case KEY_UP:
+      tmp[dim_y]--;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      break;
+    case '9':
+    case 'u':
+    case KEY_PPAGE:
+      tmp[dim_y]--;
+      tmp[dim_x]++;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '6':
+    case 'l':
+    case KEY_RIGHT:
+      tmp[dim_x]++;
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '3':
+    case 'n':
+    case KEY_NPAGE:
+      tmp[dim_y]++;
+      tmp[dim_x]++;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '2':
+    case 'j':
+    case KEY_DOWN:
+      tmp[dim_y]++;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      break;
+    case '1':
+    case 'b':
+    case KEY_END:
+      tmp[dim_y]++;
+      tmp[dim_x]--;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    case '4':
+    case 'h':
+    case KEY_LEFT:
+      tmp[dim_x]--;
+      if (dest[dim_x] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    }
+  } while (((c == 'r' || c == '.') &&
+            (!charpair(dest) || charpair(dest) == d->PC)) ||
+           (c != 'r' && c != '.' && c != 27 /* ESC */));
+
+  if (c == 27 /* ESC */) {
+    io_display(d);
+    return 1;
+  }
+
+  snprintf(s, 80,"%s, %d speed, %d HP, %d+%dd%d damage                                  ",
+           charpair(dest)->name,
+           charpair(dest)->speed,
+           charpair(dest)->hp,
+           charpair(dest)->damage->get_base(),
+           charpair(dest)->damage->get_number(),
+           charpair(dest)->damage->get_sides());
+
+  for (n = 0, p = ((npc *) charpair(dest))->description; *p; p++) {
+    if (*p == '\n') {
+      n++;
+    }
+  }
+
+  mvprintw(0, 0, s);
+  mvprintw(2, 0, ((npc *) charpair(dest))->description);
+  mvprintw(n + 4, 0, "Hit any key to continue. ");
+
+  refresh();
+  
+  getch();
+
+  io_display(d);
+
+  return 0;  
+}
+
 
 void io_handle_input(dungeon *d)
 {
@@ -1646,6 +1841,10 @@ void io_handle_input(dungeon *d)
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
       break;
+    case 'z':
+    //why are so many letters taken
+    io_ranged_attack(d);
+    break;
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
        * key code corresponds with a given keystroke.  Print out any    *
