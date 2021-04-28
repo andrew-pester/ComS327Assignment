@@ -341,7 +341,9 @@ uint32_t pc::wear_in(uint32_t slot)
   in[slot] = eq[i];
   eq[i] = tmp;
 
-  io_queue_message("You wear %s.", eq[i]->get_name());
+  io_queue_message("You %s the %s.",eq[i]->get_type() == objtype_RANGED
+  || eq[i]->get_type() == objtype_WAND || eq[i]->get_type() == objtype_WEAPON ? "equip" : "wear",
+    eq[i]->get_name());
 
   recalculate_speed();
 

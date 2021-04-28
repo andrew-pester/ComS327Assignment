@@ -1853,7 +1853,7 @@ static uint32_t io_ranged_attack(dungeon *d)
       break;
     }
     //you can cast aoe on self wanted to make it so you could damage yourself but caused unknown memory leak
-  } while (((c != 'r') || (!charpair(dest) || charpair(dest) == d->PC)) && (c != 'c') && (c != 27) /* ESC */);
+  } while ((c != 'r') && (c != 'c') && (c != 27) /* ESC */);
 
   if (c == 27 /* ESC */)
   {
@@ -1862,35 +1862,45 @@ static uint32_t io_ranged_attack(dungeon *d)
   }
   if (c == 'r')
   {
-    for (i = damage = 0; i < num_eq_slots; i++)
+    if (charpair(dest) == d->PC)
     {
-      if (i == eq_slot_weapon)
-      {
-        //do nothing this is a ranged attack
-      }
-      else if (d->PC->eq[i])
-      {
-        damage += d->PC->eq[i]->roll_dice();
-      }
-    }
-
-    io_queue_message("You hit %s%s with %s for %d.", is_unique(charpair(dest)) ? "" : "the ",
-                     charpair(dest)->name, d->PC->eq[eq_slot_ranged]->get_type() == objtype_WAND ? "a bolt of lightning" : "an arrow", damage);
-
-    if (damage >= charpair(dest)->hp)
-    {
-      io_queue_message("%s%s dies.", is_unique(charpair(dest)) ? "" : "The ", charpair(dest)->name);
-      charpair(dest)->hp = 0;
-      charpair(dest)->alive = 0;
-      character_increment_dkills(d->PC);
-      character_increment_ikills(d->PC, (character_get_dkills(charpair(dest)) +
-                                         character_get_ikills(charpair(dest))));
-      d->num_monsters--;
-      charpair(dest) = NULL;
+      io_queue_message("you %s yourself with %s.", d->PC->eq[eq_slot_ranged]->get_type() == objtype_RANGED ? "poke" : "shock", d->PC->eq[eq_slot_ranged]->get_type() == objtype_RANGED ? "an arrow" : "a spell");
+      io_queue_message("You should probably try aiming for an enemy next time.");
+    }else if(!charpair(dest)){
+      io_queue_message("You missed your %s.", d->PC->eq[eq_slot_ranged]->get_type() == objtype_RANGED ? "arrow" : "spell");
     }
     else
     {
-      charpair(dest)->hp -= damage;
+      for (i = damage = 0; i < num_eq_slots; i++)
+      {
+        if (i == eq_slot_weapon)
+        {
+          //do nothing this is a ranged attack
+        }
+        else if (d->PC->eq[i])
+        {
+          damage += d->PC->eq[i]->roll_dice();
+        }
+      }
+
+      io_queue_message("You hit %s%s with %s for %d.", is_unique(charpair(dest)) ? "" : "the ",
+                       charpair(dest)->name, d->PC->eq[eq_slot_ranged]->get_type() == objtype_WAND ? "a bolt of lightning" : "an arrow", damage);
+
+      if (damage >= charpair(dest)->hp)
+      {
+        io_queue_message("%s%s dies.", is_unique(charpair(dest)) ? "" : "The ", charpair(dest)->name);
+        charpair(dest)->hp = 0;
+        charpair(dest)->alive = 0;
+        character_increment_dkills(d->PC);
+        character_increment_ikills(d->PC, (character_get_dkills(charpair(dest)) +
+                                           character_get_ikills(charpair(dest))));
+        d->num_monsters--;
+        charpair(dest) = NULL;
+      }
+      else
+      {
+        charpair(dest)->hp -= damage;
+      }
     }
   }
   else if (c == 'c')
@@ -1901,26 +1911,23 @@ static uint32_t io_ranged_attack(dungeon *d)
       {
         //do nothing this is a ranged attack
       }
-      else if (i == eq_slot_ranged && d->PC->eq[i])
-      {
-        damage += d->PC->eq[i]->roll_dice();
-      }
       else if (d->PC->eq[i])
       {
         damage += d->PC->eq[i]->roll_dice();
       }
     }
+    damage /= 3;
     pair_t tmp;
     tmp[dim_x] = dest[dim_x] - 1;
     tmp[dim_y] = dest[dim_y] - 1;
-    //fixed loops if i have time will make fancier
-    //make the place it hits random for the bow and make it spread out with the wand
+    int count = 0;
     for (; tmp[dim_y] < dest[dim_y] + 2; tmp[dim_y]++)
     {
       for (tmp[dim_x] = dest[dim_x] - 1; tmp[dim_x] < dest[dim_x] + 2; tmp[dim_x]++)
       {
         if (charpair(tmp) && charpair(tmp) != d->PC)
         {
+          count++;
           io_queue_message("You hit %s%s with %s for %d.", is_unique(charpair(tmp)) ? "" : "the ",
                            charpair(tmp)->name, d->PC->eq[eq_slot_ranged]->get_type() == objtype_WAND ? "a poison ball" : "an arrow", damage);
           if (damage >= charpair(tmp)->hp)
@@ -1938,13 +1945,16 @@ static uint32_t io_ranged_attack(dungeon *d)
           {
             charpair(tmp)->hp -= damage;
           }
-        }
-        else
-        {
-          //keeping for testing currently
-          io_queue_message("x: %d y: %d", tmp[dim_x], tmp[dim_y]);
+        }else if(charpair(tmp) == d->PC){
+          io_queue_message("You dodge you own %s.",d->PC->eq[eq_slot_ranged]->get_type() == objtype_RANGED ? "arrow" : "spell");
+          io_queue_message("You should really be more careful.");
         }
       }
+    }
+    if(count >0){
+      io_queue_message("You hit %d enemies.", count);
+    }else{
+      io_queue_message("You missed everything somehow...");
     }
   }
   refresh();
@@ -2128,17 +2138,18 @@ void io_handle_input(dungeon *d)
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
       break;
-    case 'z':
+    case 'r':
       //why are so many letters taken
       if (d->PC->eq[eq_slot_ranged])
       {
         io_ranged_attack(d);
+        fail_code = 1;
       }
       else
       {
         io_queue_message("You do not have a ranged weapon equipped.");
+        fail_code = 0;
       }
-      fail_code = 1;
       break;
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
