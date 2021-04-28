@@ -1,0 +1,15 @@
+Andrew Pester apester@iastate.edu
+
+This assignment is built upon Prof. Sheaffers code. The PC can now roam around the dungeon 
+and find ranged weapons such as bows and wands. To start a ranged attack you must have a ranged weapon
+equipped and then you must press 'r' then 'r' again will be a concentrated attack and 'c' will 
+attack all enemies in a 3x3 area surrounding the point you choose you can also 
+press 'esc' to stop the attack. You can move the cursor as you
+normally do with things like teleporting. You can attack anywhere that the 
+PC can see but you cannot damage yourself with your own attacks. To have the new weapons appear in 
+game you may have to change your object_desc.txt in ./rlg327 with the one included the 
+description files. Currently you can only hold either a wand or a bow and directed attacks 
+do full damage and the AOE attack does 1/3 the normal damage per enemy. Most the code is located in io.cpp 
+with slight changes to things like move.cpp to make it so ranged weapons don't get included
+in the damage done for melee attacks and vice versa. Also some slight changes to things like pc.cpp to handle
+holding either a wand or a bow. 
