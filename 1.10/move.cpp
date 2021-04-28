@@ -99,6 +99,8 @@ void do_combat(dungeon *d, character *atk, character *def)
       for (i = damage = 0; i < num_eq_slots; i++) {
         if (i == eq_slot_weapon && !d->PC->eq[i]) {
           damage += atk->damage->roll();
+        }else if(i == eq_slot_ranged){
+          //skip ranged attack this is a melee attack
         } else if (d->PC->eq[i]) {
           damage += d->PC->eq[i]->roll_dice();
         }
