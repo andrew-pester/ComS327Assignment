@@ -375,14 +375,114 @@ WEIGHT 2+0d1
 COLOR RED
 DODGE 0+0d1
 VAL 20000000+0d1
-DAM 20+100d2
+DAM 20+10d10
 DEF 0+0d1
 HIT 0+0d1
 SPEED 0+0d1
 DESC
-A wand with origins going back to death itself, but how did it get here?
+A wand with origins going back to death itself, 
+there is a piece of tape holding together in the center,
+but how did it get here?
 .
 ATTR 0+0d1
 RRTY 5
+ART True
+END
+
+BEGIN OBJECT
+NAME Bow of the Galadhrim
+TYPE RANGED
+WEIGHT 2+0d1
+COLOR BLACK
+DODGE 0+0d1
+VAL 20000000+0d1
+DAM 20+10d10
+DEF 0+0d1
+HIT 0+0d1
+SPEED 0+0d1
+DESC
+A bow belonging to the famous elf legolas given to him by Galadriel.
+This type of bow was used by the Galadhrim people and is longer and more 
+stout than other bows. It is strung with elf-hair and can pack a punch.
+.
+ATTR 0+0d1
+RRTY 5
+ART TRUE
+END
+
+BEGIN OBJECT
+NAME Short Bow
+TYPE RANGED
+WEIGHT 2+0d1
+COLOR BLUE
+DODGE 0+0d1
+VAL 20+0d1
+DAM 20+3d10
+DEF 0+0d1
+HIT 0+0d1
+SPEED 0+0d1
+DESC
+A standard short bow useful for long range attacks.
+.
+ATTR 0+0d1
+RRTY 50
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME Long Bow
+TYPE RANGED
+WEIGHT 2+0d1
+COLOR RED
+DODGE 0+0d1
+VAL 20+0d1
+DAM 20+5d10
+DEF 0+0d1
+HIT 0+0d1
+SPEED 0+0d1
+DESC
+A standard long bow useful for long range attacks. Pack a bit more punch
+than your standard short bow.
+.
+ATTR 0+0d1
+RRTY 40
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME Master Wand
+TYPE WAND
+WEIGHT 2+0d1
+COLOR BLACK
+DODGE 0+0d1
+VAL 2000+0d1
+DAM 20+5d10
+DEF 0+0d1
+HIT 0+0d1
+SPEED 0+0d1
+DESC
+A master level wand for a powerful mage.
+.
+ATTR 0+0d1
+RRTY 20
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME Crystal Wand
+TYPE WAND
+WEIGHT 1+0d1
+COLOR BLUE
+DODGE 0+0d1
+VAL 200000+0d1
+DAM 20+7d10
+DEF 0+0d1
+HIT 0+0d1
+SPEED 0+0d1
+DESC
+A wand fashioned from crystal making it transparent.
+.
+ATTR 0+0d1
+RRTY 10
 ART FALSE
 END
